@@ -23,14 +23,14 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        {/* <Stack.Screen name="FirstSplash" component={FirstSplash} />
+        <Stack.Screen name="FirstSplash" component={FirstSplash} />
         <Stack.Screen name="SecondSplash" component={SecondSplash} />
         <Stack.Screen name="Introduction_one" component={Introduction_one} />
         <Stack.Screen name="Introduction_two" component={Introduction_two} />
         <Stack.Screen
           name="Introduction_three"
           component={Introduction_three}
-        /> */}
+        />
 
         <Stack.Screen name="Login_page" component={Login_page} />
         <Stack.Screen name="Register_Page" component={Register_Page} />
