@@ -1,9 +1,12 @@
 import { StyleSheet, Image, TouchableOpacity, Text, View } from "react-native";
 import React from "react";
 import succssesImg from "../assets/Succsses.png";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import the useRoute hook
 const Succsses = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use the useRoute hook to access route parameters
+  const { userEmail, authToken, userId } = route.params;
+
   return (
     <View style={styles.container}>
       <View style={styles.succssesImage}>
@@ -20,7 +23,7 @@ const Succsses = () => {
         <TouchableOpacity
           style={styles.BtnReturnToHome}
           onPress={() => {
-            navigation.navigate("Home");
+            navigation.navigate("Home", { userEmail, authToken, userId });
           }}
         >
           <Text style={styles.BtnText}>Return To Home</Text>
@@ -29,7 +32,7 @@ const Succsses = () => {
         <TouchableOpacity
           style={styles.BtnBookingAgain}
           onPress={() => {
-            navigation.navigate("Booking");
+            navigation.navigate("Booking", { userEmail, authToken, userId });
           }}
         >
           <Text style={styles.BtnText}> Book a new appointment</Text>

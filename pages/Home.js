@@ -7,13 +7,16 @@ import {
   FlatList,
   Dimensions,
   TextInput,
+  screenWidth,
+  ScrollView,
 } from "react-native";
-import React from "react";
 import slider from "../assets/sliderHome1.jpg";
 import avatar from "../assets/avatar.jpg";
 import allServices from "../assets/allServices.jpg";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import the useRoute hook
 import settings from "../assets/settings.png";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const images = [
   require("../assets/sliderHome1.jpg"), // Import your images here
@@ -22,84 +25,108 @@ const images = [
   require("../assets/slider4.png"),
 ];
 
-const screenWidth = Dimensions.get("window").width;
-
 const Home = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { userEmail, authToken, appointments, userId } = route.params;
+
+  // Extract the first 7 alphabetical characters from the user's email
+  const shortenedUserEmail = userEmail
+    .replace(/[^a-zA-Z]/g, "")
+    .substring(0, 7);
+
   return (
     <View style={styles.container}>
-      <View style={styles.headerTop}>
-        <View style={styles.header}>
-          <Image source={avatar} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.headerTop}>
+          <View style={styles.header}>
+            <Image source={avatar} />
+            <View>
+              <Text>Welcome 👋</Text>
+              <Text style={styles.headerName}>{shortenedUserEmail}</Text>
+              <Text style={styles.headerName}>id : {userId}</Text>
+            </View>
+          </View>
           <View>
-            <Text>Welcome 👋</Text>
-            <Text style={styles.headerName}>Ahmad Abelhadi</Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Sidebar", {
+                  userEmail,
+                  authToken,
+                  appointments,
+                  userId,
+                });
+              }}
+            >
+              <Image source={settings} />
+            </TouchableOpacity>
           </View>
         </View>
         <View>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Sidebar");
-            }}
-          >
-            <Image source={settings} />
-          </TouchableOpacity>
+          <Text style={styles.letsStart}>Let's Start ..</Text>
         </View>
-      </View>
-      <View>
-        <Text style={styles.letsStart}>Let's Start ..</Text>
-      </View>
-      <View style={styles.searchBar}>
-        <TextInput placeholder="🔍 Search For a Service"></TextInput>
-      </View>
+        <View style={styles.searchBar}>
+          <TextInput placeholder="🔍 Search For a Service"></TextInput>
+        </View>
 
-      {/* <View style={styles.homeSlider}>
+        {/* <View style={styles.homeSlider}>
         <Image source={slider} />
       </View> */}
-      <View style={styles.homeSlider}>
-        <FlatList
-          data={images}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.slide}>
-              <Image source={item} style={styles.image} />
-            </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
+        <View style={styles.homeSlider}>
+          <FlatList
+            data={images}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={styles.slide}>
+                <Image source={item} style={styles.image} />
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
 
-      <View>
-        <Text style={styles.allServices}>All Services</Text>
-      </View>
-      <View style={styles.services}>
-        <TouchableOpacity>
-          <Image source={allServices} />
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.allServices}>All Services</Text>
+        </View>
+        <View style={styles.services}>
+          <TouchableOpacity>
+            <Image source={allServices} />
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Booking");
-          }}
-          style={styles.serviceBtns}
-        >
-          <Text style={styles.serviceText}>حجز موعد أو إستشارة</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Booking", {
+                userEmail,
+                authToken,
+                appointments,
+                userId,
+              });
+            }}
+            style={styles.serviceBtns}
+          >
+            <Text style={styles.serviceText}>حجز موعد أو إستشارة</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("My_Appointments");
-          }}
-          style={styles.serviceBtns}
-        >
-          <Text style={styles.serviceText}>حجوزاتي</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("My_Appointments", {
+                userEmail,
+                authToken,
+                appointments,
+                userId,
+              });
+            }}
+            style={styles.serviceBtns}
+          >
+            <Text style={styles.serviceText}>حجوزاتي</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.serviceBtns}>
-          <Text style={styles.serviceText}>اطلب المساعدة</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.serviceBtns}>
+            <Text style={styles.serviceText}>اطلب المساعدة</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -121,6 +148,7 @@ const styles = StyleSheet.create({
     width: screenWidth, // Make each slide the width of the screen
   },
   image: {
+    marginRight: 10,
     resizeMode: "cover",
   },
 

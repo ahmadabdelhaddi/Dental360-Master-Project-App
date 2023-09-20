@@ -7,16 +7,18 @@ import myAppointments from "../assets/myAppointments.png";
 import logout from "../assets/logout.png";
 import help from "../assets/help.png";
 import aboutus from "../assets/aboutus.png";
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import the useRoute hook
 
-import { useNavigation } from "@react-navigation/native";
 const Sidebar = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use the useRoute hook to access route parameters
+  const { userEmail, authToken, appointments, userId } = route.params;
   return (
     <View style={styles.container}>
       <View style={styles.headerTop}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Home");
+            navigation.navigate("Home", { userEmail, authToken, userId });
           }}
         >
           <View style={styles.headerImg}>
@@ -30,7 +32,7 @@ const Sidebar = () => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Home");
+              navigation.navigate("Home", { userEmail, authToken, userId });
             }}
           >
             <Image source={settings} />
@@ -49,7 +51,11 @@ const Sidebar = () => {
       {/* My Appointment’s */}
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("My_Appointments");
+          navigation.navigate("My_Appointments", {
+            userEmail,
+            authToken,
+            userId,
+          });
         }}
       >
         <View style={styles.header}>
@@ -64,7 +70,7 @@ const Sidebar = () => {
       {/* Help */}
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("GetHelp");
+          navigation.navigate("GetHelp", { userEmail, authToken, userId });
         }}
       >
         <View style={styles.header}>
@@ -78,7 +84,7 @@ const Sidebar = () => {
 
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("AboutUs");
+          navigation.navigate("AboutUs", { userEmail, authToken, userId });
         }}
       >
         <View style={styles.header}>
@@ -141,6 +147,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignContent: "center",
-    marginBottom:10
+    marginBottom: 10,
   },
 });

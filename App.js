@@ -16,6 +16,7 @@ import Register_Page from "./pages/Registration/Register_Page";
 import My_Appointments from "./pages/My_Appointments";
 import AboutUs from "./pages/AboutUs";
 import GetHelp from "./pages/GetHelp";
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -30,8 +31,9 @@ export default function App() {
           name="Introduction_three"
           component={Introduction_three}
         /> */}
-        <Stack.Screen name="Register_Page" component={Register_Page} />
+
         <Stack.Screen name="Login_page" component={Login_page} />
+        <Stack.Screen name="Register_Page" component={Register_Page} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Booking" component={Booking} />
         <Stack.Screen name="Succsses" component={Succsses} />

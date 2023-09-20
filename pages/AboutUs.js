@@ -1,17 +1,18 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import curvedBack from "../assets/curvedBack.jpg";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import the useRoute hook
 
 const AboutUs = () => {
   const navigation = useNavigation();
-
+  const route = useRoute(); // Use the useRoute hook to access route parameters
+  const { userEmail, authToken, appointments, userId } = route.params;
   return (
     <View style={styles.container}>
       <View style={styles.bookingHeader}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Sidebar");
+            navigation.navigate("Sidebar" ,{ userEmail, authToken, userId });
           }}
         >
           <Image source={curvedBack} />

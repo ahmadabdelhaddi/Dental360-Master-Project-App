@@ -10,6 +10,7 @@ import {
 import logoSmall from "../../assets/logoSmall.png";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import jwtDecode from "jwt-decode";
 
 const Login_page = () => {
   const [email, setEmail] = useState("");
@@ -19,36 +20,35 @@ const Login_page = () => {
   const [loginError, setLoginError] = useState("");
   const navigation = useNavigation();
 
-  // const validateEmail = () => {
-  //   if (!email) {
-  //     setEmailError("Email is required");
-  //     return false;
-  //   }
-  //   // You can add more email validation logic here if needed
-  //   setEmailError("");
-  //   return true;
-  // };
+  const validateEmail = () => {
+    if (!email) {
+      setEmailError("Email is required");
+      return false;
+    }
+    // You can add more email validation logic here if needed
+    setEmailError("");
+    return true;
+  };
 
-  // const validatePassword = () => {
-  //   if (!password) {
-  //     setPasswordError("Password is required");
-  //     return false;
-  //   }
-  //   setPasswordError("");
-  //   return true;
-  // };
+  const validatePassword = () => {
+    if (!password) {
+      setPasswordError("Password is required");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
 
   const onSignUpPress = () => {
     navigation.navigate("Register_Page");
   };
 
   const handleLogin = async () => {
-    // if (!validateEmail() || !validatePassword()) {
-    //   return;
-    // }
+    if (!validateEmail() && !validatePassword()) {
+      return;
+    }
 
     try {
-      // Make a POST request to your server's login endpoint to obtain the authentication token
       const loginResponse = await axios.post(
         "https://backendserver-9s51.onrender.com/api/user/login",
         {
@@ -63,22 +63,28 @@ const Login_page = () => {
       );
 
       if (loginResponse.status === 200) {
-        // Successful login, you can handle the user data here
-        console.log("Login successful", loginResponse.data);
-
-        // Get the authentication token from the response
         const authToken = loginResponse.data.token;
+        const appointments = loginResponse.data.appointments;
 
-        // Navigate to the Home screen and pass the user's email as a parameter
-        navigation.navigate("Home", { userEmail: loginResponse.data.email }); // <- Add this line
+        // Decode the JWT token to get the user ID
+        const decodedToken = jwtDecode(authToken);
+        const userIdFromToken = decodedToken._id;
 
-        // No need to make a separate GET request for user data here; you can do it in the Home screen if needed
+        // Print the user ID in the console
+        console.log("User ID:", loginResponse.data.email);
+        console.log("User ID:", authToken);
+        console.log("User ID:", appointments);
+        console.log("User ID:", userIdFromToken);
+
+        navigation.navigate("Home", {
+          userEmail: loginResponse.data.email,
+          authToken,
+          appointments,
+          userId: userIdFromToken, // Pass the user ID as a parameter
+        });
       }
     } catch (error) {
-      // Handle errors, e.g., show an error message
       console.error("Error logging in:", error);
-
-      // Set an error message for login failure
       setLoginError("Login failed. Please check your credentials.");
     }
   };

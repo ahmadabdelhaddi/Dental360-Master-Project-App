@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -5,63 +6,52 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
-  Button,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import curvedBack from "../assets/curvedBack.jpg";
-import { useNavigation } from "@react-navigation/native";
 import map from "../assets/map.png";
 import logo from "../assets/logoSmall.png";
-import axios from "axios"; // Import the axios library
+import axios from "axios";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const My_Appointments = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { userEmail, authToken, userId } = route.params;
 
-  // get all appointments
   const [appointments, setAppointments] = useState(null);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchAppointmentsForUser = async () => {
       try {
+        const USER_ID = userId;
+
         const response = await axios.get(
-          "https://backendserver-9s51.onrender.com/api/appointments"
+          `https://backendserver-9s51.onrender.com/api/appointments/user/${USER_ID}`
         );
 
         if (response.status === 200) {
-          setAppointments(response.data); // Use response.data instead of response.json()
+          setAppointments(response.data);
         }
       } catch (error) {
         console.error("Error fetching appointments:", error);
       }
     };
 
-    fetchAppointments();
-  }, []); // Removed 'appointments' from dependencies array as it caused an infinite loop
+    fetchAppointmentsForUser();
+  }, [userEmail, authToken]);
 
-  // update status
-  // Function to update appointment status
-  const updateStatus = async (appointmentId, newStatus) => {
-    try {
-      console.log(`Updating status for appointment with ID: ${appointmentId}`);
-      const response = await axios.patch(
-        `https://backendserver-9s51.onrender.com/api/appointments/${appointmentId}`,
-        {
-          status: newStatus,
-        }
-      );
-
-      if (response.status === 200) {
-        // Update the local appointments list with the new status
-        const updatedAppointments = appointments.map((appointment) => {
-          if (appointment._id === appointmentId) {
-            return { ...appointment, status: newStatus };
-          }
-          return appointment;
-        });
-        setAppointments(updatedAppointments);
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "pending":
+        return { backgroundColor: "#FFEFD7", color: "#A05E03" };
+      case "completed":
+        return { backgroundColor: "#C9F0FF", color: "#0065D0" };
+      case "accepted":
+        return { backgroundColor: "#ECFCE5", color: "#198155" };
+      case "declined":
+        return { backgroundColor: "#FFE5E5", color: "#D3180C" };
+      default:
+        return { backgroundColor: "gray", color: "white" };
     }
   };
 
@@ -70,7 +60,7 @@ const My_Appointments = () => {
       <View style={styles.bookingHeader}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Home");
+            navigation.navigate("Home", { userEmail, authToken, userId });
           }}
         >
           <Image source={curvedBack} />
@@ -88,32 +78,26 @@ const My_Appointments = () => {
             </View>
             <View>
               <Text style={styles.historyHeaderText}>{item.fullName}</Text>
-              <Text>Hour: {item.selectedHour} PM</Text>
-              <Text>Service: {item.service}</Text>
+              <Text>Hour: {item.selectedHour}</Text>
+              <Text>Date: {item.selectedDate}</Text>
+              <Text>Phone: {item.phoneNumber}</Text>
+              <Text>Phone: {item.service}</Text>
               <Text
-                style={{
-                  backgroundColor: "#FFEFD7",
-                  color: "#A05E03",
-                  padding: 10,
-                }}
+                style={[
+                  styles.status,
+                  {
+                    backgroundColor: getStatusStyle(item.status)
+                      .backgroundColor,
+                    color: getStatusStyle(item.status).color,
+                  },
+                ]}
               >
                 Status: {item.status}
               </Text>
+              <Text style={styles.line}>
+                ----------------------------------------------
+              </Text>
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                updateStatus(item._id, "Accepted");
-              }}
-            >
-              <Text style={styles.button}>Accept</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                updateStatus(item._id, "Rejected");
-              }}
-            >
-              <Text style={styles.button}>Cancel</Text>
-            </TouchableOpacity>
           </View>
         )}
       />
@@ -129,8 +113,8 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     backgroundColor: "white",
     paddingHorizontal: 16,
-    marginBottom: 20,
   },
+
   bookingHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -157,13 +141,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 18,
   },
-
-  button: {
-    backgroundColor: "#007BFF",
-    color: "#FFFFFF",
+  status: {
     padding: 10,
-    margin: 5,
-    borderRadius: 5,
     textAlign: "center",
+    fontWeight: "bold",
+    marginTop: 5,
+    borderRadius: 17,
+    width: 200,
+  },
+  line: {
+    color: "#E0E0E0",
   },
 });
